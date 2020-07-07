@@ -1,0 +1,9 @@
+EXIT_RESULT="$?"
+clear
+if [ "${EXIT_RESULT}" -eq 124 ]; then
+	echo -e "${RED}TIme Expired: ${BLUE}Returning to ${YELLOW}StarDoc 134${CLEAR}"
+else
+	echo -e "${BLUE}Returning to ${YELLOW}StarDoc 134${CLEAR}"
+fi
+/home/wwiv/bbs/chains/status.sh "BBS" "MENU"
+sleep 2

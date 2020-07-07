@@ -1,0 +1,59 @@
+export LANG=en_US.IBM437
+export RED='\033[0;31m'
+export GREEN='\033[0;32m'
+export BLUE='\033[0;34m'
+export PURPLE='\033[0;35m'
+export YELLOW='\033[0;33m'
+export CLEAR='\033[0m'
+export WHITE='\033[97m'
+echo -e "${BLUE}WWIV ${GREEN}Chain Loader${YELLOW} V1.10 ${WHITE}[${PURPLE}${TITLE}${WHITE}]${CLEAR}"
+
+
+if [ -z "${TITLE}" ]; then
+	echo -e "${RED}Sanity Check Failed\n${YELLOW}Reconfigure chains to include title string\n\n${PURPLE}"
+	read -t 10 -p "<<=Pause=>>"
+	exit
+fi
+
+if [ "${PWD}" = "/home/wwiv/bbs" ]; then
+	echo -e "${RED}Sanity Check Failed\n${YELLOW}Reconfigure chains for Temp/Home\n\n${PURPLE}"
+	read -t 10 -p "<<=Pause=>>"
+	exit
+fi
+
+function displaytime {
+  local T=$1
+  local D=$((T/60/60/24))
+  local H=$((T/60/60%24))
+  local M=$((T/60%60))
+  local S=$((T%60))
+  (( $D > 0 )) && printf '%d days ' $D
+  (( $H > 0 )) && printf '%d hours ' $H
+  (( $M > 0 )) && printf '%d minutes ' $M
+  (( $D > 0 || $H > 0 || $M > 0 )) && printf 'and '
+  printf '%d seconds\n' $S
+}
+
+export BBS_USER=$(cat ${PWD}/chain.txt | sed '2!d')
+export BBS_NAME=$(cat ${PWD}/chain.txt | sed '3!d')
+export BBS_USER_NUM=$(cat ${PWD}/chain.txt | sed '1!d')
+export BBS_TIME=$(cat ${PWD}/chain.txt | sed '16!d' | tr -d '[:space:]' | awk -F"." '{print $1}')
+export BBS_USER_HOME="${WWIV_DIR}/doors/homedir/${BBS_USER}"
+
+echo -e "${BLUE}USER:${PURPLE} ${BBS_USER} ${GREEN}[${YELLOW}${BBS_USER_NUM}${GREEN}]${CLEAR}"
+echo -e "${BLUE}Chain will be ${YELLOW}terminated ${BLUE}automaticaly in ${YELLOW}$(displaytime ${BBS_TIME})${CLEAR}\n"
+
+if [ "${REMOTE}" = "true" ]; then
+	cat /home/wwiv/bbs/gfiles/LEAVING.ANS
+	sleep 5
+fi
+
+mkdir -p ${BBS_USER_HOME}
+export HOME=${BBS_USER_HOME}
+export TERM=xterm-color
+export TERMINFO=/etc/terminfo
+export BBS_HOME_CHECK="true"
+/home/wwiv/bbs/chains/status.sh "DOOR" "${TITLE}"
+cd ${HOME}
+sleep 2
+
