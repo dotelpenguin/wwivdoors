@@ -6,19 +6,19 @@ export PURPLE='\033[0;35m'
 export YELLOW='\033[0;33m'
 export CLEAR='\033[0m'
 export WHITE='\033[97m'
-echo -e "${BLUE}WWIV ${GREEN}Chain Loader${YELLOW} V1.10 ${WHITE}[${PURPLE}${TITLE}${WHITE}]${CLEAR}"
+echo -e "${BLUE}WWIV ${GREEN}Chain Loader${YELLOW} V1.20 ${WHITE}[${PURPLE}${TITLE}${WHITE}]${CLEAR}"
 
 
 if [ -z "${TITLE}" ]; then
-	echo -e "${RED}Sanity Check Failed\n${YELLOW}Reconfigure chains to include title string\n\n${PURPLE}"
-	read -t 10 -p "<<=Pause=>>"
-	exit
+        echo -e "${RED}Sanity Check Failed\n${YELLOW}Reconfigure chains to include title string\n\n${PURPLE}"
+        read -t 10 -p "<<=Pause=>>"
+        exit
 fi
 
 if [ "${PWD}" = "/home/wwiv/bbs" ]; then
-	echo -e "${RED}Sanity Check Failed\n${YELLOW}Reconfigure chains for Temp/Home\n\n${PURPLE}"
-	read -t 10 -p "<<=Pause=>>"
-	exit
+        echo -e "${RED}Sanity Check Failed\n${YELLOW}Reconfigure chains for Temp/Home\n\n${PURPLE}"
+        read -t 10 -p "<<=Pause=>>"
+        exit
 fi
 
 function displaytime {
@@ -34,6 +34,7 @@ function displaytime {
   printf '%d seconds\n' $S
 }
 
+export BBS_CHAINS=${PWD}
 export BBS_USER=$(cat ${PWD}/chain.txt | sed '2!d')
 export BBS_NAME=$(cat ${PWD}/chain.txt | sed '3!d')
 export BBS_USER_NUM=$(cat ${PWD}/chain.txt | sed '1!d')
@@ -44,8 +45,8 @@ echo -e "${BLUE}USER:${PURPLE} ${BBS_USER} ${GREEN}[${YELLOW}${BBS_USER_NUM}${GR
 echo -e "${BLUE}Chain will be ${YELLOW}terminated ${BLUE}automaticaly in ${YELLOW}$(displaytime ${BBS_TIME})${CLEAR}\n"
 
 if [ "${REMOTE}" = "true" ]; then
-	cat /home/wwiv/bbs/gfiles/LEAVING.ANS
-	sleep 5
+        cat /home/wwiv/bbs/gfiles/LEAVING.ANS
+        sleep 5
 fi
 
 mkdir -p ${BBS_USER_HOME}
@@ -56,4 +57,3 @@ export BBS_HOME_CHECK="true"
 /home/wwiv/bbs/chains/status.sh "DOOR" "${TITLE}"
 cd ${HOME}
 sleep 2
-
