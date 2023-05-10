@@ -1,4 +1,11 @@
+#!/bin/bash
+
+# Common setup for launching chains
+
+# Optional: I prefer locking my BBS to the IBM437 CodePage
 export LANG=en_US.IBM437
+
+# Setup some  Global color to make things pretty
 export RED='\033[0;31m'
 export GREEN='\033[0;32m'
 export BLUE='\033[0;34m'
@@ -6,21 +13,31 @@ export PURPLE='\033[0;35m'
 export YELLOW='\033[0;33m'
 export CLEAR='\033[0m'
 export WHITE='\033[97m'
-echo -e "${BLUE}WWIV ${GREEN}Chain Loader${YELLOW} V1.20 ${WHITE}[${PURPLE}${TITLE}${WHITE}]${CLEAR}"
+
+export CVER="V1.60"
+
+# Welcomes user to chainloader TODO: Lets make this exported so others can use
+echo -e "${BLUE}WWIV ${GREEN}Chain Loader${YELLOW} ${CVER} ${WHITE}[${PURPLE}${TITLE}${WHITE}]${CLEAR}"
 
 
+
+# Some sanity checks
+# I require a title to be passed on so web portal can track users status
 if [ -z "${TITLE}" ]; then
-        echo -e "${RED}Sanity Check Failed\n${YELLOW}Reconfigure chains to include title string\n\n${PURPLE}"
-        read -t 10 -p "<<=Pause=>>"
-        exit
+	echo -e "${RED}Sanity Check Failed\n${YELLOW}Reconfigure chains to include title string\n\n${PURPLE}"
+	read -t 10 -p "<<=Pause=>>"
+	exit
 fi
 
+# I require all chains/doors be launched from the TEMP/Node directory. This will cause door to exit if not met.
 if [ "${PWD}" = "/home/wwiv/bbs" ]; then
-        echo -e "${RED}Sanity Check Failed\n${YELLOW}Reconfigure chains for Temp/Home\n\n${PURPLE}"
-        read -t 10 -p "<<=Pause=>>"
-        exit
+	echo -e "${RED}Sanity Check Failed\n${YELLOW}Reconfigure chains for Temp/Home\n\n${PURPLE}"
+	read -t 10 -p "<<=Pause=>>"
+	exit
 fi
 
+
+# Dirty function to convert seconds to human readable There are better ways to do this but this works
 function displaytime {
   local T=$1
   local D=$((T/60/60/24))
@@ -34,6 +51,7 @@ function displaytime {
   printf '%d seconds\n' $S
 }
 
+# Exports some BBS/User information 
 export BBS_CHAINS=${PWD}
 export BBS_USER=$(cat ${PWD}/chain.txt | sed '2!d')
 export BBS_NAME=$(cat ${PWD}/chain.txt | sed '3!d')
@@ -41,19 +59,42 @@ export BBS_USER_NUM=$(cat ${PWD}/chain.txt | sed '1!d')
 export BBS_TIME=$(cat ${PWD}/chain.txt | sed '16!d' | tr -d '[:space:]' | awk -F"." '{print $1}')
 export BBS_USER_HOME="${WWIV_DIR}/doors/homedir/${BBS_USER}"
 
+
+# Identifies user, and displays remaining time
 echo -e "${BLUE}USER:${PURPLE} ${BBS_USER} ${GREEN}[${YELLOW}${BBS_USER_NUM}${GREEN}]${CLEAR}"
 echo -e "${BLUE}Chain will be ${YELLOW}terminated ${BLUE}automaticaly in ${YELLOW}$(displaytime ${BBS_TIME})${CLEAR}\n"
 
+
+# If remote is True, displays my leaving bbs message
 if [ "${REMOTE}" = "true" ]; then
-        cat /home/wwiv/bbs/gfiles/LEAVING.ANS
-        sleep 5
+	cat /home/wwiv/bbs/gfiles/LEAVING.ANS
+	sleep 5
 fi
 
+# If remote is IRC, displays ICQ  message
+if [ "${REMOTE}" = "irc" ]; then
+	echo -e "\n${YELLOW}Loading IRC Gateway"
+	sleep 1
+	echo -e "${GREEN}-------------------"
+	echo -e "${PURPLE}/QUIT ${BLUE}=> Quit\n${CLEAR}"
+	echo -e "${WHITE}You Will be Joining Chat Shortly.\n"
+	echo -e "${RED}Mind Your Manners${CLEAR}\n"
+	sleep 3
+fi
+
+
+# Creates user folder if missing
 mkdir -p ${BBS_USER_HOME}
+
+# Exports some more variables
 export HOME=${BBS_USER_HOME}
 export TERM=xterm-color
 export TERMINFO=/etc/terminfo
 export BBS_HOME_CHECK="true"
+
+# Updates web portal with user status
 /home/wwiv/bbs/chains/status.sh "DOOR" "${TITLE}"
+
 cd ${HOME}
 sleep 2
+

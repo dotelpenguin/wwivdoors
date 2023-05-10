@@ -1,9 +1,14 @@
+#!/bin/bash
 EXIT_RESULT="$?"
 clear
+
+# If door exited with 124 this indicates timeout was reached and process terminated
 if [ "${EXIT_RESULT}" -eq 124 ]; then
 	echo -e "${RED}TIme Expired: ${BLUE}Returning to ${YELLOW}StarDoc 134${CLEAR}"
 else
 	echo -e "${BLUE}Returning to ${YELLOW}StarDoc 134${CLEAR}"
 fi
+
+# Updates user status on web portal
 /home/wwiv/bbs/chains/status.sh "BBS" "MENU"
 sleep 2

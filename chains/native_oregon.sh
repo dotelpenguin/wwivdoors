@@ -1,8 +1,8 @@
 #!/bin/bash
-TITLE="BBSLINK(${1})"
-REMOTE="true"
+TITLE="Oregon Trail"
+REMOTE="false"
 trap "echo" SIGHUP SIGINT SIGTERM
 source /home/wwiv/bbs/chains/.wwivrc
 if [ ! "${BBS_HOME_CHECK}" == "true" ]; then exit; fi
-timeout --kill-after 1 --foreground ${BBS_TIME} python2 /home/wwiv/bbs/doors/native/native_bbslink.py ${1} ${BBS_USER_NUM}
+timeout --kill-after 1 --foreground ${BBS_TIME} /home/wwiv/bbs/doors/native/oregon/oregon -l -USERNAME ${BBS_USER}
 source /home/wwiv/bbs/chains/.wwivrc_exit
